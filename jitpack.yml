@@ -1,4 +1,4 @@
 install:
   - FILE="-Dfile=camera.aar"
-  - mvn install:install-file $FILE -DgroupId=com.truvideo.sdk -DartifactId=camera -Dversion=0.66.1-beta.32 -Dpackaging=aar -DgeneratePom=true
+  - mvn install:install-file $FILE -DgroupId=com.truvideo.sdk -DartifactId=camera -Dversion=0.66.1-rc.36 -Dpackaging=aar -DgeneratePom=true
 
