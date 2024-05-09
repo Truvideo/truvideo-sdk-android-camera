@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.truvideo.sdk</groupId>
   <artifactId>camera</artifactId>
-  <version>0.66.1.37</version>
+  <version>66.1.1-beta.38</version>
   <packaging>pom</packaging>
   <dependencies>
     <dependency>
