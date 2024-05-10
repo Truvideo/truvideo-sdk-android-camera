@@ -1,0 +1,22 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        maven {
+            setUrl("https://jitpack.io")
+            credentials { username = "jp_38kphfk010bgll0eioc1i908rs" }
+        }
+        google()
+        mavenCentral()
+        mavenLocal()
+    }
+}
+rootProject.name = "truvideo.sdk.camera"
+include ':camera'
+//include ':app'
