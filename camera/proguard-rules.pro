@@ -1,0 +1,7 @@
+-keep class co.touchlab.kermit.** { *; }
+-keep class com.russhwolf.settings.** { *; }
+-keep class io.ktor.** { *; }
+-keep class io.realm.kotlin.** { *; }
+-keep class kotlinx.datetime.** { *; }
+-keep class kotlinx.serialization.** { *; }
+-keep class com.truvideo.sdk.camera.** { *; }
