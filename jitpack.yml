@@ -1,4 +1,2 @@
-install:
-  - FILE="-Dfile=camera.aar"
-  - mvn install:install-file $FILE -DgroupId=com.truvideo.sdk -DartifactId=camera -Dversion=66.1.1-beta.38 -Dpackaging=aar -DgeneratePom=true
-
+jdk:
+  - openjdk17
