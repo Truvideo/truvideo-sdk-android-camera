@@ -1,0 +1,4 @@
+versionName=73.1.3-rc.74
+commonVersion=0.0.73
+environment=beta
+validateAuthentication=true
