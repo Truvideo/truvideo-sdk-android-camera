@@ -1,0 +1,4 @@
+versionName=75.1.1-dev.83
+commonVersion=0.0.75
+environment=beta
+validateAuthentication=true
