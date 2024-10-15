@@ -1,0 +1,4 @@
+versionName=75.1.4-rc.98
+commonVersion=0.0.75
+environment=beta
+validateAuthentication=true
