@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name_camera">TruVideoSDK-Camera</string>
+    <string name="title_activity_camera_compose">CameraActivityCompose</string>
+    <string name="title_activity_scanner">ScannerActivity</string>
+</resources>
