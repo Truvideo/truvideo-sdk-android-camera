@@ -57,8 +57,8 @@ import java.util.Locale
 internal class TruvideoSdkCameraService(
     private val context: Context,
     val information: TruvideoSdkCameraInformation,
-    private val textureView: TextureView,
-    private val serviceCallback: TruvideoSdkCameraServiceCallback
+    private var textureView: TextureView,
+    private var serviceCallback: TruvideoSdkCameraServiceCallback
 ) {
 
     companion object {
@@ -98,6 +98,14 @@ internal class TruvideoSdkCameraService(
     private var videoOrientation = TruvideoSdkCameraOrientation.PORTRAIT
     private var videoLensFacing = TruvideoSdkCameraLensFacing.FRONT
 
+    fun updateTextureView(value: TextureView) {
+        textureView = value
+    }
+
+    fun updateServiceCallback(value: TruvideoSdkCameraServiceCallback) {
+        serviceCallback = value
+    }
+
     private var backgroundHandlerThread: HandlerThread? = null
     private var backgroundHandler: Handler? = null
 
@@ -117,6 +125,10 @@ internal class TruvideoSdkCameraService(
     private var maxDurationReported = false
     private var videoDurationTimer: PausableTimer? = null
     var videoDuration = MutableStateFlow(0L)
+
+    fun isRecording() = isRecording
+
+    fun isPaused() = isPaused
 
     val tapToFocusListener = object : GestureDetector.SimpleOnGestureListener() {
         override fun onSingleTapUp(event: MotionEvent): Boolean {

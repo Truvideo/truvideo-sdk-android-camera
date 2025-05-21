@@ -2,4 +2,5 @@
     <string name="app_name_camera">TruVideoSDK-Camera</string>
     <string name="title_activity_camera_compose">CameraActivityCompose</string>
     <string name="title_activity_scanner">ScannerActivity</string>
+    <string name="truvideo_sdk_camera_service_name">Camera service</string>
 </resources>

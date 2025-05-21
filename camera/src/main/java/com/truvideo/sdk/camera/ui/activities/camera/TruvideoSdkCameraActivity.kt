@@ -95,6 +95,12 @@ import com.truvideo.sdk.camera.model.events.TruvideoSdkCameraEventResolutionChan
 import com.truvideo.sdk.camera.model.events.TruvideoSdkCameraEventZoomChanged
 import com.truvideo.sdk.camera.service.camera.TruvideoSdkCameraService
 import com.truvideo.sdk.camera.service.camera.TruvideoSdkCameraServiceCallback
+import com.truvideo.sdk.camera.service.camera.CameraForegroundService
+import android.content.ServiceConnection
+import android.content.ComponentName
+import android.content.Intent
+import android.content.Context
+import android.os.IBinder
 import com.truvideo.sdk.camera.ui.components.capture_button.CaptureButton
 import com.truvideo.sdk.camera.ui.components.exit_panel.ExitPanel
 import com.truvideo.sdk.camera.ui.components.media_count_indicator.MediaCountIndicator
@@ -142,6 +148,31 @@ class TruvideoSdkCameraActivity : ComponentActivity() {
     private lateinit var configuration: TruvideoSdkCameraConfiguration
 
     private lateinit var cameraService: TruvideoSdkCameraService
+    private lateinit var serviceCallback: TruvideoSdkCameraServiceCallback
+    private var foregroundService: CameraForegroundService? = null
+    private var serviceBound = false
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
+            val service = (binder as CameraForegroundService.LocalBinder).getService()
+            foregroundService = service
+            if (service.cameraService == null) {
+                service.initialize(cameraService)
+            } else {
+                cameraService = service.cameraService!!
+                cameraService.updateTextureView(textureView)
+                cameraService.updateServiceCallback(serviceCallback)
+            }
+            viewModel.updateIsPreviewVisible(service.cameraService?.isCameraOpened?.value == true)
+            viewModel.updateIsRecording(service.cameraService?.isRecording() == true)
+            viewModel.updateIsPaused(service.cameraService?.isPaused() == true)
+            serviceBound = true
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            serviceBound = false
+            foregroundService = null
+        }
+    }
 
     private lateinit var getCameraInformationUseCase: GetCameraInformationUseCase
 
@@ -275,6 +306,11 @@ class TruvideoSdkCameraActivity : ComponentActivity() {
         if (permissionGranted) {
             Log.d(TAG, "Permissions granted")
 
+            if (!serviceBound) {
+                val intent = Intent(this, CameraForegroundService::class.java)
+                bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+            }
+
             if (textureView.isAvailable) {
                 Log.d(TAG, "TextureView available")
                 if (cameraService.isCameraOpened.value) {
@@ -301,17 +337,15 @@ class TruvideoSdkCameraActivity : ComponentActivity() {
         Log.d(TAG, "OnPause")
         if (permissionGranted) {
             Log.d(TAG, "Permissions granted")
-            if (viewModel.isRecording.value) {
-                Log.d(TAG, "Recording video")
-                if (!viewModel.isPaused.value) {
-                    Log.d(TAG, "Recording not paused")
-                    cameraService.pauseRecording()
-                }
+            if (viewModel.isRecording.value || viewModel.isPreviewVisible.value) {
+                val intent = Intent(this, CameraForegroundService::class.java)
+                startService(intent)
             } else {
                 Log.d(TAG, "Not recording video")
                 CoroutineScope(Dispatchers.Default).launch {
                     cameraService.disconnect()
                 }
+                stopService(Intent(this, CameraForegroundService::class.java))
             }
         } else {
             Log.d(TAG, "Permissions not granted")
@@ -320,6 +354,10 @@ class TruvideoSdkCameraActivity : ComponentActivity() {
 
     override fun onDestroy() {
         viewModel.close()
+        if (serviceBound) {
+            unbindService(serviceConnection)
+            serviceBound = false
+        }
         super.onDestroy()
     }
 
@@ -1304,13 +1342,9 @@ class TruvideoSdkCameraActivity : ComponentActivity() {
         )
 
         val information = getCameraInformationUseCase()
-        cameraService = TruvideoSdkCameraService(
-            context = this,
-            information = information,
-            textureView = textureView,
-            serviceCallback = object : TruvideoSdkCameraServiceCallback {
-                override fun onRecordingStarted() {
-                    viewModel.updateIsRecording(true)
+        serviceCallback = object : TruvideoSdkCameraServiceCallback {
+            override fun onRecordingStarted() {
+                viewModel.updateIsRecording(true)
 
                     // Report event
                     sendEvent(
@@ -1534,8 +1568,16 @@ class TruvideoSdkCameraActivity : ComponentActivity() {
 
                     viewModel.updateFocusState(FocusState.LOCKED)
                 }
-            },
+            }
+        cameraService = TruvideoSdkCameraService(
+            context = this,
+            information = information,
+            textureView = textureView,
+            serviceCallback = serviceCallback,
         )
+
+        val intent = Intent(this, CameraForegroundService::class.java)
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
 
         val info = cameraService.information
         if (!info.withCameras) {

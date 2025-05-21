@@ -21,6 +21,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application>
         <meta-data
@@ -60,6 +61,11 @@
                 android:name="com.truvideo.sdk.camera.TruvideoSdkCameraInitializer"
                 android:value="androidx.startup" />
         </provider>
+
+        <service
+            android:name=".service.camera.CameraForegroundService"
+            android:exported="false"
+            android:foregroundServiceType="camera" />
     </application>
 
 </manifest>
