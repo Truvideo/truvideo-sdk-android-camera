@@ -1,0 +1,17 @@
+android {
+    flavorDimensions = ['environments']
+    productFlavors {
+        dev{
+            dimension 'environments'
+        }
+        beta {
+            dimension 'environments'
+        }
+        rc {
+            dimension 'environments'
+        }
+        prod {
+            dimension 'environments'
+        }
+    }
+}
